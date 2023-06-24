@@ -1,6 +1,7 @@
 pipeline {
     agent any
     environment{
+        PATH = "/opt/apache-maven-3.9.2/bin:$PATH"
         DOCKER_TAG = getDockerTag()
     }
     stages{

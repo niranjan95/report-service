@@ -28,7 +28,7 @@ pipeline {
                sh "chmod +x changeTag.sh"
                sh "./changeTag.sh ${DOCKER_TAG}"
                sh "kubectl apply -f app-deployment.yaml"
-               sh "kubectl apply -f app-service.yaml"
+               sh "kubectl apply -f service.yaml"
             }
         }
     }

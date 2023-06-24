@@ -27,6 +27,7 @@ pipeline {
             steps{
                sh "chmod +x changeTag.sh"
                sh "./changeTag.sh ${DOCKER_TAG}"
+               sh "export KUBECONFIG=~/.kube/config"
                sh "kubectl apply -f app-deployment.yaml"
                sh "kubectl apply -f app-service.yaml"
             }

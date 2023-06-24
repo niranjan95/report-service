@@ -2,7 +2,6 @@ pipeline {
     agent any
     environment{
         PATH = "/opt/apache-maven-3.9.2/bin:$PATH"
-        KUBECONFIG="/home/ec2-user/.kube/config"
         DOCKER_TAG = getDockerTag()
     }
     stages{

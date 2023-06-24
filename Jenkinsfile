@@ -29,9 +29,14 @@ pipeline {
                sh "./changeTag.sh ${DOCKER_TAG}"
                script{
                    try{
-                       sh "kubectl apply -f ."
+                       sh "kubectl apply -f app-deployment.yaml"
                    }catch(error){
-                       sh "kubectl create -f ."
+                       sh "kubectl create -f app-deployment.yaml"
+                   }
+                   try{
+                       sh "kubectl apply -f service.yaml"
+                   }catch(error){
+                       sh "kubectl create -f service.yaml"
                    }
                }
             }

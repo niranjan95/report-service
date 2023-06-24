@@ -1,2 +1,2 @@
 #!/bin/bash
-sed "s/tagVersion/$1/g" deployment.yml > validation-service-deployment.yml
+sed "s/tagVersion/$1/g" deployment.yaml > app-deployment.yaml

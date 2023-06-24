@@ -1,0 +1,16 @@
+com\cloudservice\report\model\InstrumentData$InstrumentDataBuilder.class
+com\cloudservice\report\model\TradeData$TradeDataBuilder.class
+com\cloudservice\report\config\ReportConfig.class
+com\cloudservice\report\model\InstrumentData.class
+com\cloudservice\report\model\TradeDataRequest.class
+com\cloudservice\report\service\TradeDataEnrichService.class
+com\cloudservice\report\config\ElasticSearchConfig.class
+com\cloudservice\report\service\FileProcessorService.class
+com\cloudservice\report\ValidationServiceApplication.class
+com\cloudservice\report\service\ResponseGenerationService.class
+com\cloudservice\report\service\TradeDataValidationService.class
+com\cloudservice\report\model\TradeData.class
+com\cloudservice\report\service\TradeDataService.class
+com\cloudservice\report\service\ElasticsearchService.class
+com\cloudservice\report\controller\TradeDataController.class
+com\cloudservice\report\config\SwaggerConfig.class

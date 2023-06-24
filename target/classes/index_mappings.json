@@ -1,0 +1,22 @@
+{
+  "properties": {
+    "title": {
+      "type": "text"
+    },
+    "description": {
+      "type": "text"
+    },
+    "price": {
+      "type": "float"
+    },
+    "timestamp": {
+      "type": "date"
+    },
+    "tags": {
+      "type": "keyword"
+    },
+    "location": {
+      "type": "geo_point"
+    }
+  }
+}

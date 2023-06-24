@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: validation-service
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: validation-service
+    spec:
+      containers:
+        - name: validation-service
+          image: nk95/validation-service:tagVersion
+          ports:
+            - containerPort: 8080

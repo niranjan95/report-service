@@ -2,6 +2,7 @@ pipeline {
     agent any
     environment{
         PATH = "/opt/apache-maven-3.9.2/bin:$PATH"
+        KUBECONFIG="/home/ec2-user/.kube/config"
         DOCKER_TAG = getDockerTag()
     }
     stages{
@@ -27,7 +28,7 @@ pipeline {
             steps{
                sh "chmod +x changeTag.sh"
                sh "./changeTag.sh ${DOCKER_TAG}"
-               sh "export KUBECONFIG=/home/ec2-user/.kube/config"
+               sh "echo ${KUBECONFIG}"
                sh "kubectl apply -f app-deployment.yaml"
                sh "kubectl apply -f app-service.yaml"
             }

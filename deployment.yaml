@@ -28,4 +28,4 @@ spec:
       volumes:
         - name: efs-volume
           persistentVolumeClaim:
-            claimName: efs-pvc1
+            claimName: efs-pvc

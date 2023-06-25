@@ -22,3 +22,10 @@ spec:
           image: nk95/validation-service:tagVersion
           ports:
             - containerPort: 8080
+          volumeMounts:
+            - name: efs-volume
+              mountPath: /mnt/m2/validation-service
+      volumes:
+        - name: efs-volume
+          persistentVolumeClaim:
+            claimName: efs-pvc

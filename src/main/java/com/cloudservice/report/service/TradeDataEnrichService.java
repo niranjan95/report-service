@@ -26,8 +26,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class TradeDataEnrichService implements ApplicationListener<ApplicationReadyEvent>  {
 
-    @Value("${file.reference.folder.path}")
-    private String refrenceDataPath;
+    @Value("${cloud.service.reference.data.dir}")
+    private String referenceDataPath;
 	
     @Autowired
     private StreamFactory streamFactory;
@@ -38,7 +38,7 @@ public class TradeDataEnrichService implements ApplicationListener<ApplicationRe
     public void onApplicationEvent(ApplicationReadyEvent event) {
 		
 		AtomicInteger rowIndex = new AtomicInteger();
-        try (Stream<String> stream = Files.lines(Paths.get(refrenceDataPath))) {
+        try (Stream<String> stream = Files.lines(Paths.get(referenceDataPath))) {
             stream.forEach(row -> {
                 if (rowIndex.get() == 0) {
                     rowIndex.set(1);
@@ -50,7 +50,7 @@ public class TradeDataEnrichService implements ApplicationListener<ApplicationRe
             });
         } catch (IOException e) {
 			// TODO Auto-generated catch block
-			log.error("Error occured while reading instrument data file");
+			log.error("Error occurred while reading instrument data file");
 		}
     }
 

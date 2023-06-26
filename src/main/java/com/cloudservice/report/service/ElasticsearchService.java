@@ -55,7 +55,7 @@ public class ElasticsearchService {
         if (bulkResponse.hasFailures()) {
             log.info("Bulk indexing failed: " + bulkResponse.buildFailureMessage());
         } else {
-            log.info("Bulk indexing successful");
+            log.info("Bulk indexing is successful");
         }
     }
 

@@ -28,12 +28,12 @@ public class ResponseGenerationService {
 		}
 		int lastDotIndex = name.lastIndexOf(".");
 		if(lastDotIndex != -1) {
-			String extension = name.substring(lastDotIndex, name.length());
+			String extension = name.substring(lastDotIndex);
 			name = name.substring(0, lastDotIndex);
 			LocalDateTime currentTime = LocalDateTime.now();
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
 			String timeStamp = currentTime.format(formatter);
-			try (CSVWriter writer = new CSVWriter(new FileWriter(filePath +  "RESP_" + name + "_" + timeStamp + extension))) {
+			try (CSVWriter writer = new CSVWriter(new FileWriter(filePath + "/" +  "RESP_" + name + "_" + timeStamp + extension))) {
 				// Write headers
 				String[] headers = { "Record Number", "Transaction Id", "Status" };
 				long row_num = 1;

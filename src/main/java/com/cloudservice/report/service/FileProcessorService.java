@@ -6,14 +6,15 @@ import org.beanio.BeanReader;
 import org.beanio.StreamFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -21,15 +22,15 @@ import java.util.stream.Stream;
 
 @Component
 @Slf4j
-public class FileProcessorService implements ApplicationListener<ApplicationReadyEvent> {
+public class FileProcessorService {
 
     private static final long MAX_FILE_SIZE = 50 * 1024 * 1024; // 50 MB in bytes
 
-    @Value("${file.folder.path}")
-    private String folderPath;
+    @Value("${cloud.service.source.data.dir}")
+    private String sourceDataDir;
 
-    @Value("${file.response.folder.path}")
-    private String responsePath;
+    @Value("${cloud.service.response.data.dir}")
+    private String responseDataDir;
 
     @Autowired
     private StreamFactory streamFactory;
@@ -46,52 +47,18 @@ public class FileProcessorService implements ApplicationListener<ApplicationRead
     @Autowired
     private ElasticsearchService elasticsearchService;
 
-    @Override
-    public void onApplicationEvent(ApplicationReadyEvent event) {
-        try {
-            processExistingFiles();
-            startFileWatcher();
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-           log.error("Error occurred while reading file");
+    public void uploadAndProcessFile(MultipartFile file) throws IOException {
+        File uploadDir = new File(sourceDataDir);
+        if (!uploadDir.exists()) {
+            uploadDir.mkdirs();
         }
-    }
-
-    private void processExistingFiles() throws IOException {
-        File folder = new File(folderPath);
-        File[] files = folder.listFiles();
-        if (files != null) {
-            for (File file : files) {
-                if (file.isFile()) {
-                    processFile(file);
-                }
-            }
-        }
-    }
-
-    private void startFileWatcher() {
-        try (WatchService watchService = FileSystems.getDefault().newWatchService()) {
-            Path path = Paths.get(folderPath);
-            path.register(watchService, StandardWatchEventKinds.ENTRY_CREATE);
-
-            while (true) {
-                WatchKey watchKey = watchService.take();
-                for (WatchEvent<?> event : watchKey.pollEvents()) {
-                    WatchEvent.Kind<?> kind = event.kind();
-                    if (kind == StandardWatchEventKinds.ENTRY_CREATE) {
-                        Path filePath = path.resolve((Path) event.context());
-                        processFile(filePath.toFile());
-                    }
-                }
-                watchKey.reset();
-            }
-        } catch (IOException | InterruptedException e) {
-            log.error("Error occurred while reading file");
-        }
+        byte[] bytes = file.getBytes();
+        Path path = Paths.get(sourceDataDir + "/" + file.getOriginalFilename());
+        Files.write(path, bytes);
+        processFile(path.toFile());
     }
 
     private void processFile(File file) throws IOException {
-        // Add your file processing logic here
         log.info("Start of Processing file: " + file.getAbsolutePath());
         if (validateFileSize(file)) {
             throw new RuntimeException("File [{" + file.getAbsolutePath() + "}] size is beyond " + "50MB.");
@@ -111,7 +78,7 @@ public class FileProcessorService implements ApplicationListener<ApplicationRead
                 }
             });
             if (!trades.isEmpty()) {
-                responseGenerationService.generateResponseFile(trades, responsePath, file.getName());
+                responseGenerationService.generateResponseFile(trades, responseDataDir, file.getName());
                 elasticsearchService.uploadDocuments(trades);
             }
         }

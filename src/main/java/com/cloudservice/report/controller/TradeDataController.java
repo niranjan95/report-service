@@ -30,7 +30,7 @@ public class TradeDataController {
     @Autowired
     private FileProcessorService fileProcessorService;
 
-    private static Map<String, ProcessStatus> PROCESS_STATUS_MAP = new HashMap<>();
+    private static final Map<String, ProcessStatus> PROCESS_STATUS_MAP = new HashMap<>();
 
     @PostMapping("/getTradeData")
     public List<TradeData> getTradData(@RequestBody TradeDataRequest tradeDataRequest) {

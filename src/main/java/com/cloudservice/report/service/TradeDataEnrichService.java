@@ -32,7 +32,7 @@ public class TradeDataEnrichService implements ApplicationListener<ApplicationRe
     @Autowired
     private StreamFactory streamFactory;
     
-	private Map<String, InstrumentData> referenceDataMap = new HashMap<>();
+	private final Map<String, InstrumentData> referenceDataMap = new HashMap<>();
 
 	@Override
     public void onApplicationEvent(ApplicationReadyEvent event) {

@@ -22,6 +22,12 @@ spec:
           image: nk95/validation-service:tagVersion
           ports:
             - containerPort: 8080
+          env:
+            - name: ES_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: es-secret
+                  key: es-pass
           volumeMounts:
             - name: efs-volume
               mountPath: /mnt/m2/validation-service

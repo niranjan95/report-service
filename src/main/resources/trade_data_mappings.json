@@ -80,6 +80,9 @@
     },
     "status": {
       "type": "keyword"
+    },
+    "clientId": {
+      "type": "keyword"
     }
   }
 }

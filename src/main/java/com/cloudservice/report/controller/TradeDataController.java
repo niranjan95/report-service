@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
+import javax.servlet.http.HttpServletRequest;
+
 @RestController
 @Slf4j
 public class TradeDataController {
@@ -33,28 +35,30 @@ public class TradeDataController {
     private static final Map<String, ProcessStatus> PROCESS_STATUS_MAP = new HashMap<>();
 
     @PostMapping("/getTradeData")
-    public List<TradeData> getTradData(@RequestBody TradeDataRequest tradeDataRequest) {
-        return tradeDataService.fetchTradeData(tradeDataRequest);
+    public List<TradeData> getTradData(@RequestBody TradeDataRequest tradeDataRequest, HttpServletRequest request) {
+    	String clientId = request.getAttribute("clientId").toString();
+        return tradeDataService.fetchTradeData(tradeDataRequest, clientId);
     }
 
     @PostMapping(value = "/uploadTradeData", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public String uploadTradeData(@RequestParam("file") MultipartFile file) {
+    public String uploadTradeData(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
         if (file.isEmpty()) {
             return "file is empty";
         }
+        String clientId = request.getAttribute("clientId").toString();
         String responseFileName = CommonUtil.getResponseFileName(file);
-        PROCESS_STATUS_MAP.put(responseFileName, ProcessStatus.PROCESSING);
+        PROCESS_STATUS_MAP.put(clientId + "_" + responseFileName, ProcessStatus.PROCESSING);
         CompletableFuture.runAsync(() -> {
             try {
-                fileProcessorService.uploadAndProcessFile(file);
+                fileProcessorService.uploadAndProcessFile(file, clientId);
             } catch (Exception e) {
                 throw new RuntimeException("Error occurred while processing file", e);
             }
         }).handle((result, exception) -> {
             if (exception == null) {
-                PROCESS_STATUS_MAP.put(responseFileName, ProcessStatus.COMPLETED);
+                PROCESS_STATUS_MAP.put(clientId + "_" + responseFileName, ProcessStatus.COMPLETED);
             } else {
-                PROCESS_STATUS_MAP.put(responseFileName, ProcessStatus.FAILED);
+                PROCESS_STATUS_MAP.put(clientId + "_" + responseFileName, ProcessStatus.FAILED);
                 log.error("Error occurred", exception);
             }
             return null;
@@ -64,8 +68,9 @@ public class TradeDataController {
     }
 
     @PostMapping("/getResponseFileStatus")
-    public String getTradData(@RequestParam("responseFileName") String responseFileName) {
-        ProcessStatus processStatus = PROCESS_STATUS_MAP.get(responseFileName);
+    public String getTradData(@RequestParam("responseFileName") String responseFileName, HttpServletRequest request) {
+        String clientId = request.getAttribute("clientId").toString();
+        ProcessStatus processStatus = PROCESS_STATUS_MAP.get(clientId + "_" + responseFileName);
         if (processStatus != null) {
             return processStatus.name();
         } else {

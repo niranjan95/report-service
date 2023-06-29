@@ -98,9 +98,11 @@ public class TradeData {
     @Field(trim = true, at = 25)
     String loanJurisdictionOfIssuer;
 
+    private String status;
+    
+    private String clientId;
+
     public String getId() {
         return String.format("%s-%s-%s-%s-%s", transactionID, reportingCounterPartyCode, nonReportingCounterPartyCode, securityIdentifier, eventDate);
     }
-
-    private String status;
 }

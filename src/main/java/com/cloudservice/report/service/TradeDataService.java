@@ -16,8 +16,9 @@ public class TradeDataService {
     @Autowired
     private ElasticsearchService elasticsearchService;
 
-    public List<TradeData> fetchTradeData(TradeDataRequest tradeDataRequest) {
+    public List<TradeData> fetchTradeData(TradeDataRequest tradeDataRequest, String clientId) {
         BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
+        boolQuery.must(QueryBuilders.termQuery("clientId", clientId));
         if(StringUtils.isNotEmpty(tradeDataRequest.getTransactionID())) {
             boolQuery.must(QueryBuilders.termQuery("transactionID", tradeDataRequest.getTransactionID()));
         }

@@ -47,18 +47,18 @@ public class FileProcessorService {
     @Autowired
     private ElasticsearchService elasticsearchService;
 
-    public void uploadAndProcessFile(MultipartFile file) throws IOException {
-        File uploadDir = new File(sourceDataDir);
+    public void uploadAndProcessFile(MultipartFile file, String clientId) throws IOException {
+        File uploadDir = new File(sourceDataDir + "/" + clientId);
         if (!uploadDir.exists()) {
             uploadDir.mkdirs();
         }
         byte[] bytes = file.getBytes();
-        Path path = Paths.get(sourceDataDir + "/" + file.getOriginalFilename());
+        Path path = Paths.get(sourceDataDir + "/" + clientId + "/" + file.getOriginalFilename());
         Files.write(path, bytes);
-        processFile(path.toFile());
+        processFile(path.toFile(), clientId);
     }
 
-    private void processFile(File file) throws IOException {
+    private void processFile(File file, String clientId) throws IOException {
         log.info("Start of Processing file: " + file.getAbsolutePath());
         if (validateFileSize(file)) {
             throw new RuntimeException("File [{" + file.getAbsolutePath() + "}] size is beyond " + "50MB.");
@@ -74,11 +74,12 @@ public class FileProcessorService {
                     TradeData tradeData = (TradeData) beanReader.read();
                     tradeDataEnrichService.enrich(tradeData);
                     tradeDataValidationService.validate(tradeData);
+                    tradeData.setClientId(clientId);
                     trades.add(tradeData);
                 }
             });
             if (!trades.isEmpty()) {
-                responseGenerationService.generateResponseFile(trades, responseDataDir, file.getName());
+                responseGenerationService.generateResponseFile(trades, responseDataDir + "/" + clientId + "/response", file.getName());
                 elasticsearchService.uploadDocuments(trades);
             }
         }

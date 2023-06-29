@@ -27,10 +27,7 @@ public class FileProcessorService {
     private static final long MAX_FILE_SIZE = 50 * 1024 * 1024; // 50 MB in bytes
 
     @Value("${cloud.service.source.data.dir}")
-    private String sourceDataDir;
-
-    @Value("${cloud.service.response.data.dir}")
-    private String responseDataDir;
+    private String filePath;
 
     @Autowired
     private StreamFactory streamFactory;
@@ -48,12 +45,12 @@ public class FileProcessorService {
     private ElasticsearchService elasticsearchService;
 
     public void uploadAndProcessFile(MultipartFile file, String clientId) throws IOException {
-        File uploadDir = new File(sourceDataDir + "/" + clientId);
+        File uploadDir = new File(filePath + "/" + clientId);
         if (!uploadDir.exists()) {
             uploadDir.mkdirs();
         }
         byte[] bytes = file.getBytes();
-        Path path = Paths.get(sourceDataDir + "/" + clientId + "/" + file.getOriginalFilename());
+        Path path = Paths.get(filePath + "/" + clientId + "/" + file.getOriginalFilename());
         Files.write(path, bytes);
         processFile(path.toFile(), clientId);
     }
@@ -79,10 +76,11 @@ public class FileProcessorService {
                 }
             });
             if (!trades.isEmpty()) {
-                responseGenerationService.generateResponseFile(trades, responseDataDir + "/" + clientId + "/response", file.getName());
+                responseGenerationService.generateResponseFile(trades, filePath, clientId, file.getName());
                 elasticsearchService.uploadDocuments(trades);
             }
         }
+        file.delete();
         log.info("End of Processing file: " + file.getAbsolutePath());
     }
 

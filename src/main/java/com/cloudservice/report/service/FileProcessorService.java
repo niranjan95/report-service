@@ -81,7 +81,7 @@ public class FileProcessorService {
             }
         }
         file.delete();
-        log.info("End of Processing file: " + file.getAbsolutePath());
+        log.info("End of1 Processing file: " + file.getAbsolutePath());
     }
 
     private boolean validateFileSize(File file) {

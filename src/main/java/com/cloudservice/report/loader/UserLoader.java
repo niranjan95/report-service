@@ -26,7 +26,7 @@ public class UserLoader {
     @PostConstruct
     public void loadUsersFromFile() {
         ClassPathResource resource = new ClassPathResource(FILE_PATH);
-        try (BufferedReader reader = new BufferedReader(new FileReader("/mnt/m2/validation-service/UserData.csv"))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("/mnt/m2/validation-service/userData.csv"))) {
             String line;
             boolean isFirstLine = true;
             String[] headers = null;

@@ -10,7 +10,16 @@ pipeline {
                 sh "mvn clean package"
             }
         }
-
+        stage('Sonarqube') {
+          environment {
+            SONAR_URL = "http://34.227.108.89:9000"
+          }
+          steps {
+            withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
+            sh 'mvn sonar:sonar -Dsonar.login=$SONAR_AUTH_TOKEN -Dsonar.host.url=${SONAR_URL}'
+            }
+          }
+        }
         stage('Build Docker Image'){
             steps{
                 sh "docker build . -t nk95/validation-service:${DOCKER_TAG}"

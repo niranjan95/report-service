@@ -30,6 +30,7 @@ pipeline {
                 withCredentials([string(credentialsId: 'docker-hub', variable: 'dockerHubPwd')]) {
                     sh "docker login -u nk95 -p ${dockerHubPwd}"
                     sh "docker push nk95/validation-service:${DOCKER_TAG}"
+                    sh "docker rmi nk95/validation-service:${DOCKER_TAG}"
                 }
             }
         }

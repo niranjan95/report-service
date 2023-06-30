@@ -4,7 +4,6 @@ import com.cloudservice.report.model.UserData;
 import com.cloudservice.report.repository.UserRepository;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ResourceUtils;
 
 import javax.annotation.PostConstruct;
 import java.io.BufferedReader;
@@ -27,7 +26,7 @@ public class UserLoader {
     @PostConstruct
     public void loadUsersFromFile() {
         ClassPathResource resource = new ClassPathResource(FILE_PATH);
-        try (BufferedReader reader = new BufferedReader(new FileReader(ResourceUtils.getURL(FILE_PATH).getFile()))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("/mnt/m2/validation-service"))) {
             String line;
             boolean isFirstLine = true;
             String[] headers = null;

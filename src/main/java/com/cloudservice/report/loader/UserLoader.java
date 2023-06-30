@@ -4,6 +4,7 @@ import com.cloudservice.report.model.UserData;
 import com.cloudservice.report.repository.UserRepository;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ResourceUtils;
 
 import javax.annotation.PostConstruct;
 import java.io.BufferedReader;
@@ -14,56 +15,58 @@ import java.util.Map;
 
 @Component
 public class UserLoader {
-	private static final String FILE_PATH = "appData/userData.csv";
-	private UserRepository userRepository;
-	
-	public UserLoader(UserRepository userRepository) {
-		this.userRepository = userRepository;
-	}
+    private static final String FILE_PATH = "classpath:appData/userData.csv";
 
-	@PostConstruct
-	public void loadUsersFromFile() {
-		ClassPathResource resource = new ClassPathResource(FILE_PATH);
-		try (BufferedReader reader = new BufferedReader(new FileReader(resource.getFile()))) {
-			String line;
-			boolean isFirstLine = true;
-			String[] headers = null;
 
-			while ((line = reader.readLine()) != null) {
-				String[] parts = line.split(",");
-				if (isFirstLine) {
-					headers = parts;
-					isFirstLine = false;
-				} else if (headers != null && parts.length == headers.length) {
-					Map<String, String> attributes = new HashMap<>();
+    private UserRepository userRepository;
 
-					for (int i = 0; i < headers.length; i++) {
-						String header = headers[i].trim();
-						String value = parts[i].trim();
-						attributes.put(header, value);
-					}
+    public UserLoader(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
-					UserData user = createUserFromAttributes(attributes);
-					if (user != null) {
-						userRepository.save(user);
-					}
-				}
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+    @PostConstruct
+    public void loadUsersFromFile() {
+        ClassPathResource resource = new ClassPathResource(FILE_PATH);
+        try (BufferedReader reader = new BufferedReader(new FileReader(ResourceUtils.getURL(FILE_PATH).getFile()))) {
+            String line;
+            boolean isFirstLine = true;
+            String[] headers = null;
 
-	private UserData createUserFromAttributes(Map<String, String> attributes) {
-		String secretkey = attributes.get("secretkey");
-		String clientId = attributes.get("clientId");
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",");
+                if (isFirstLine) {
+                    headers = parts;
+                    isFirstLine = false;
+                } else if (headers != null && parts.length == headers.length) {
+                    Map<String, String> attributes = new HashMap<>();
 
-		// Validate required attributes
-		if (secretkey != null  && clientId != null) {
-			return new UserData(secretkey, clientId);
-		}
+                    for (int i = 0; i < headers.length; i++) {
+                        String header = headers[i].trim();
+                        String value = parts[i].trim();
+                        attributes.put(header, value);
+                    }
 
-		// Invalid user attributes
-		return null;
-	}
+                    UserData user = createUserFromAttributes(attributes);
+                    if (user != null) {
+                        userRepository.save(user);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private UserData createUserFromAttributes(Map<String, String> attributes) {
+        String secretkey = attributes.get("secretkey");
+        String clientId = attributes.get("clientId");
+
+        // Validate required attributes
+        if (secretkey != null && clientId != null) {
+            return new UserData(secretkey, clientId);
+        }
+
+        // Invalid user attributes
+        return null;
+    }
 }

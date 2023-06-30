@@ -53,6 +53,11 @@ pipeline {
             }
         }
     }
+    post {
+        always {
+            cleanWs()
+        }
+   }
 }
 
 def getDockerTag(){

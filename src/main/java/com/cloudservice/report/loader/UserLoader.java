@@ -14,7 +14,7 @@ import java.util.Map;
 
 @Component
 public class UserLoader {
-	private static final String FILE_PATH = "userData.csv";
+	private static final String FILE_PATH = "appData/userData.csv";
 	private UserRepository userRepository;
 	
 	public UserLoader(UserRepository userRepository) {

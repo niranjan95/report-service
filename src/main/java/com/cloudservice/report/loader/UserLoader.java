@@ -1,22 +1,20 @@
 package com.cloudservice.report.loader;
+
+import com.cloudservice.report.model.UserData;
+import com.cloudservice.report.repository.UserRepository;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
-
-import org.apache.lucene.analysis.util.ResourceLoader;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import com.cloudservice.report.model.UserData;
-import com.cloudservice.report.repository.UserRepository;
-
 @Component
 public class UserLoader {
-	private static final String FILE_PATH = "classpath:static/UserData.csv";
+	private static final String FILE_PATH = "userData.csv";
 	private UserRepository userRepository;
 	
 	public UserLoader(UserRepository userRepository) {
@@ -25,7 +23,8 @@ public class UserLoader {
 
 	@PostConstruct
 	public void loadUsersFromFile() {
-		try (BufferedReader reader = new BufferedReader(new FileReader("src/main/resources/static/UserData.csv"))) {
+		ClassPathResource resource = new ClassPathResource(FILE_PATH);
+		try (BufferedReader reader = new BufferedReader(new FileReader(resource.getFile()))) {
 			String line;
 			boolean isFirstLine = true;
 			String[] headers = null;

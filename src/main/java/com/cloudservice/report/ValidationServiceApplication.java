@@ -32,9 +32,6 @@ public class ValidationServiceApplication {
 
     @GetMapping("/")
     public String home() {
-
-    s3Client.putObject("validation-service-811141562050-us-east-1", "response/TradeData.csv", new File("C:\\tmp\\validation-service\\TradeData.csv"));
-
         return "Welcome to validation service !!!";
     }
 

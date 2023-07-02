@@ -17,12 +17,14 @@ spec:
       labels:
         app: validation-service
     spec:
-      serviceAccountName: validation-service-sa
       containers:
         - name: validation-service
           image: nk95/validation-service:tagVersion
           ports:
             - containerPort: 8080
+          envFrom:
+            - secretRef:
+                name: aws-access-secret
           volumeMounts:
             - name: efs-volume
               mountPath: /mnt/m2/validation-service

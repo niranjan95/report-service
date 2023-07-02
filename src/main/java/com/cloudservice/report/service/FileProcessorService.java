@@ -44,7 +44,7 @@ public class FileProcessorService {
     @Autowired
     private ElasticsearchService elasticsearchService;
 
-    public void uploadAndProcessFile(MultipartFile file, String clientId) throws IOException {
+    public void uploadAndProcessFile(MultipartFile file, String clientId, String responseFileName) throws IOException {
         File uploadDir = new File(filePath + "/" + clientId);
         if (!uploadDir.exists()) {
             uploadDir.mkdirs();
@@ -52,10 +52,10 @@ public class FileProcessorService {
         byte[] bytes = file.getBytes();
         Path path = Paths.get(filePath + "/" + clientId + "/" + file.getOriginalFilename());
         Files.write(path, bytes);
-        processFile(path.toFile(), clientId);
+        processFile(path.toFile(), clientId, responseFileName);
     }
 
-    private void processFile(File file, String clientId) throws IOException {
+    private void processFile(File file, String clientId, String responseFileName) throws IOException {
         log.info("Start of Processing file: " + file.getAbsolutePath());
         if (validateFileSize(file)) {
             throw new RuntimeException("File [{" + file.getAbsolutePath() + "}] size is beyond " + "50MB.");
@@ -76,7 +76,7 @@ public class FileProcessorService {
                 }
             });
             if (!trades.isEmpty()) {
-                responseGenerationService.generateResponseFile(trades, filePath, clientId, file.getName());
+                responseGenerationService.generateResponseFile(trades, filePath, clientId, responseFileName);
                 elasticsearchService.uploadDocuments(trades);
             }
         }

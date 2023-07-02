@@ -20,6 +20,5 @@ public class CommonUtil {
         } else {
             throw new RuntimeException("File extension not found");
         }
-
     }
 }

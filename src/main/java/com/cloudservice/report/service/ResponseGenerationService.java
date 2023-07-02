@@ -27,7 +27,7 @@ public class ResponseGenerationService {
     @Autowired
     private AmazonS3 s3Client;
 
-    public void generateResponseFile(List<TradeData> trades, String filePath, String clientId, String name) {
+    public void generateResponseFile(List<TradeData> trades, String filePath, String clientId, String responseFileName) {
         String responseDataDir = filePath + "/" + clientId + "/response";
         File parentDir = new File(responseDataDir);
         if (!parentDir.exists()) {
@@ -37,34 +37,25 @@ public class ResponseGenerationService {
                 return;
             }
         }
-        int lastDotIndex = name.lastIndexOf(".");
-        if (lastDotIndex != -1) {
-            String extension = name.substring(lastDotIndex);
-            name = name.substring(0, lastDotIndex);
-            LocalDateTime currentTime = LocalDateTime.now();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
-            String timeStamp = currentTime.format(formatter);
-            String fileName = "RESP_" + name + "_" + timeStamp + extension;
-            String fileNameWithPath = responseDataDir + "/" + fileName;
-            try (CSVWriter writer = new CSVWriter(new FileWriter(fileNameWithPath))) {
-                // Write headers
-                String[] headers = {"Record Number", "Transaction Id", "Status"};
-                long row_num = 1;
-                writer.writeNext(headers);
-                // Write data records
-                for (TradeData trade : trades) {
-                    String[] rowData = {"" + row_num++, trade.getTransactionID(), trade.getStatus()};
-                    writer.writeNext(rowData);
-                }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+        String fileNameWithPath = responseDataDir + "/" + responseFileName;
+        try (CSVWriter writer = new CSVWriter(new FileWriter(fileNameWithPath))) {
+            // Write headers
+            String[] headers = {"Record Number", "Transaction Id", "Status"};
+            long row_num = 1;
+            writer.writeNext(headers);
+            // Write data records
+            for (TradeData trade : trades) {
+                String[] rowData = {"" + row_num++, trade.getTransactionID(), trade.getStatus()};
+                writer.writeNext(rowData);
             }
-            s3Client.putObject(s3Directory, clientId + "/response/" + fileName, new File(fileNameWithPath));
-            try {
-                Files.delete(Paths.get(fileNameWithPath));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        s3Client.putObject(s3Directory, clientId + "/response/" + responseFileName, new File(fileNameWithPath));
+        try {
+            Files.delete(Paths.get(fileNameWithPath));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }

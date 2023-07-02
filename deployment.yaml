@@ -17,6 +17,7 @@ spec:
       labels:
         app: validation-service
     spec:
+      serviceAccountName: validation-service-sa
       containers:
         - name: validation-service
           image: nk95/validation-service:tagVersion

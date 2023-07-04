@@ -117,9 +117,4 @@ public class TradeDataController {
             return ProcessStatus.FAILED_OR_NOT_FOUND.getMessage();
         }
     }
-
-    @GetMapping("/hello")
-    public String hello(){
-      return "hello";
-    }
 }
